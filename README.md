@@ -16,10 +16,13 @@ In lab 1, the counter and video module, which drew images onto the screen was de
 
 [ac97.vhd](https://raw.githubusercontent.com/JohnTerragnoli/ECE383_Lab02/master/Code/Given%20Code/ac97.vhd)
 Converts the incoming signal into a 18 bit std_logic_vector.  
+
 [lab2.ucf](https://raw.githubusercontent.com/JohnTerragnoli/ECE383_Lab02/master/Code/Given%20Code/lab2.ucf)
 Defines the inputs and outputs on the ATLYS board. 
+
 [lab2.vhd](https://raw.githubusercontent.com/JohnTerragnoli/ECE383_Lab02/master/Code/Given%20Code/lab2.vhd)
-The overall shell for the lab.  
+The overall shell for the lab.
+
 [lab2_pack.vhdl](https://raw.githubusercontent.com/JohnTerragnoli/ECE383_Lab02/master/Code/Given%20Code/lab2_pack.vhdl)
 Contains component declarations so only the instantiation has to be declared in the lab2 file, or any other file which feeds off of it.  
 
