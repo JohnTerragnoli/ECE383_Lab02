@@ -39,7 +39,7 @@ Also, I then realized that the wiring on the first diagram was wrong, so that it
 
 The read is the where the wire should be, and the green is crossing out the wrong wire.  
 
-
+After the project was segmented like this, I decided to delve right in to building each piece.  
 
 
 #Trials/Building Process
