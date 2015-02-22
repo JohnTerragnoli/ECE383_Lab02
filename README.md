@@ -12,8 +12,6 @@ The schematic can be seen below:
 
 ![alt tag](https://raw.githubusercontent.com/JohnTerragnoli/ECE383_Lab02/master/Pictures/givenSchematic.gif "original Schematic")
 
-**Note** This 
-
 In lab 1, the counter and video module, which drew images onto the screen was developed.  This takes care of the top right three boxes.  The two other largest components were the BRAM and the AC'97.  Luckily, these files were already given, and only instantiations of them had to be made in this lab.  The original files are shown below: 
 
 [ac97.vhd](https://raw.githubusercontent.com/JohnTerragnoli/ECE383_Lab02/master/Code/Given%20Code/ac97.vhd)
