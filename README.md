@@ -30,6 +30,16 @@ Contains component declarations so only the instantiation has to be declared in 
 
 To tackle the rest of the lab, the schematic was split up into different areas, as shown below.  The logic for these areas was then written in separate blocks in the datapath file, which I was to make.  
 
+![alt tag](https://raw.githubusercontent.com/JohnTerragnoli/ECE383_Lab02/master/Pictures/Marked%20Original%20Schematic.jpg "marked original Schematic")
+
+
+Also, I then realized that the wiring on the first diagram was wrong, so that it should be as below: 
+
+![alt tag](https://raw.githubusercontent.com/JohnTerragnoli/ECE383_Lab02/master/Pictures/Fixed%20Wire%20Schematic.jpg "fixed wire Schematic")
+
+The read is the where the wire should be, and the green is crossing out the wrong wire.  
+
+
 
 
 #Trials/Building Process
