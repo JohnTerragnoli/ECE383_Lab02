@@ -12,11 +12,11 @@ NET "TMDS(3)"	LOC = "B6" | IOSTANDARD = TMDS_33 ; # Clock
 NET "TMDSB(3)"	LOC = "A6" | IOSTANDARD = TMDS_33 ;
 
 # onBoard PUSH BUTTONS 
- NET "btn<0>" LOC = "N4";  # Bank = 3, Pin name = IO_L1P,			Sch name = BTNU
- NET "btn<1>" LOC = "P4";  # Bank = 3, Pin name = IO_L2P,			Sch name = BTNL
- NET "btn<2>" LOC = "P3";  # Bank = 3, Pin name = IO_L2N,			Sch name = BTND
- NET "btn<3>" LOC = "F6";  # Bank = 3, Pin name = IO_L55P_M3A13,	Sch name = BTNR
- NET "btn<4>" LOC = "F5";  # Bank = 3, Pin name = IO_L55N_M3A14,	Sch name = BTNC
+NET "btn<0>" LOC = "N4";  # Bank = 3, Pin name = IO_L1P,			Sch name = BTNU
+NET "btn<1>" LOC = "P4";  # Bank = 3, Pin name = IO_L2P,			Sch name = BTNL
+NET "btn<2>" LOC = "P3";  # Bank = 3, Pin name = IO_L2N,			Sch name = BTND
+NET "btn<3>" LOC = "F6";  # Bank = 3, Pin name = IO_L55P_M3A13,	Sch name = BTNR
+NET "btn<4>" LOC = "F5";  # Bank = 3, Pin name = IO_L55N_M3A14,	Sch name = BTNC
  
 NET "BIT_CLK" LOC = L13;
 NET "SDATA_IN" LOC = T18;
@@ -25,12 +25,12 @@ NET "SYNC" LOC = U17;
 NET "AC97_n_RESET" LOC = T17;
 
  # PMOD Connector
- # NET "JB<0>"  LOC = "T3"; # Bank = 2,  Pin name = IO_L62N_D6,     Sch name = JA-D0_N
- #  NET "JB<1>"  LOC = "R3"; # Bank = 2,  Pin name = IO_L62P_D5,     Sch name = JA-D0_P
- #  NET "JB<2>"  LOC = "P6"; # Bank = 2,  Pin name = IO_L64N_D9,     Sch name = JA-D2_N
- #  NET "JB<3>"  LOC = "N5"; # Bank = 2,  Pin name = IO_L64P_D8,     Sch name = JA-D2_P
- #  NET "JB<4>"  LOC = "V9"; # Bank = 2,  Pin name = IO_L32N_GCLK28, Sch name = JA-CLK_N
- #  NET "JB<5>"  LOC = "T9"; # Bank = 2,  Pin name = IO_L32P_GCLK29, Sch name = JA-CLK_P
- #  NET "JB<6>"  LOC = "V4"; # Bank = 2,  Pin name = IO_L63N,        Sch name = JA-D1_N
- #  NET "JB<7>"  LOC = "T4"; # Bank = 2,  Pin name = IO_L63P,        Sch name = JA-D1_P
+NET "JB<0>"  LOC = "T3"; # Bank = 2,  Pin name = IO_L62N_D6,     Sch name = JA-D0_N
+NET "JB<1>"  LOC = "R3"; # Bank = 2,  Pin name = IO_L62P_D5,     Sch name = JA-D0_P
+NET "JB<2>"  LOC = "P6"; # Bank = 2,  Pin name = IO_L64N_D9,     Sch name = JA-D2_N
+NET "JB<3>"  LOC = "N5"; # Bank = 2,  Pin name = IO_L64P_D8,     Sch name = JA-D2_P
+NET "JB<4>"  LOC = "V9"; # Bank = 2,  Pin name = IO_L32N_GCLK28, Sch name = JA-CLK_N
+NET "JB<5>"  LOC = "T9"; # Bank = 2,  Pin name = IO_L32P_GCLK29, Sch name = JA-CLK_P
+NET "JB<6>"  LOC = "V4"; # Bank = 2,  Pin name = IO_L63N,        Sch name = JA-D1_N
+NET "JB<7>"  LOC = "T4"; # Bank = 2,  Pin name = IO_L63P,        Sch name = JA-D1_P
  
