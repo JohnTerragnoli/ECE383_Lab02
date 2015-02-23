@@ -53,11 +53,34 @@ After the project was segmented like this, I decided to delve right in to buildi
 7. Then I re-did all of the instantiations and tried to fix all of the error messages which popped up at me.  Some signals weren't declared and such.  They were relatively easy fixes, althought there were a lot of them.  
 8. I immediately started working on all of the logic sections I divided up at the beginning.  First up was the BRAM counter, since I felt like I could use my old counter to make this work.  I was able to do so, except I had to modify my cw(1 downto 0), which was sent from the control unit, to be accepted by my counter frame.  This involved turning the two bit control signal into two different one bit signals.  This was fairly easy.  I then declared and instantiated the BRAM_counter, and hooked up the control signals to it.  Also, instead of the comparator, I just had the roll over go straight to the sw(1) signal.  The output, wrtie_cntr, went to be an input of the WRADDR in BRAM.  
 9. Then I instantiated the comparator between the readL and row and set sw(2) = 1 all the time.  
-10. I took some time to analyze the control and status signals which would be required, then I built a fsm diagam with codes for cw and sw to match the datapath.  After the diagram was made, building the fsm was easy.  Something actually came on the screen when I ran it!  It wasn't a waveform, it was like pulsing lines on the screen that would go with the music (I have a video of it).  This was pretty exciting.
-11. After that, I realized that I forgot to hook up two of the wires, write_cntr and WRADDR.  This means that the address was not being input into BRAM, but an output signal was still occuring.  Then, when I connected the two wires, it was back to nothing but a grid.  So much for that.  
-12. So this got me thinking, do I even need a BRAM?  What if I just delay the unsigned input to readL by one cycle?  Well I tried that just for kicks because it was 0342 at night, but it still didn't work.  Although that would've been cool.
-13. Then I realized I could still get the other parts of the functionality, so I started working on the testbench for the fsm.  I created a simple testbench for the control unit, which would receive various sw signals during simulation, to check that it kept moving to the correct states.  It in fact did, meaning it would control the computer correctly.  
-14. The waveform and a screenshot of the waveform can be seen below: 
+10. I took some time to analyze the control and status signals which would be required, then I built a fsm diagam with codes for cw and sw to match the datapath.  After the diagram was made, building the fsm was easy.  The diagram is below: 
+ ![alt tag](https://raw.githubusercontent.com/JohnTerragnoli/ECE383_Lab02/master/Pictures/FSM%20Schematic.JPG "fsm schematic")
+
+```
+--CW Table-----------------------------------------------------------------------
+--CW(0XX) = exSel off
+--CW(1XX) = exSel on
+--CW(X00) = reset counter
+--CW(X01) = count up
+--CW(X10) = hold
+--CW(X11) = **not used**
+---------------------------------------------------------------------------------
+```
+
+```
+sw(0) = ready from ac97
+sw(1) = rollover from bram counter
+sw(2) = trigger
+```
+
+
+11. Something actually came on the screen when I ran it!  It wasn't a waveform, it was like pulsing lines on the screen that would go with the music (I have a video of it).  This was pretty exciting.
+12. After that, I realized that I forgot to hook up two of the wires, write_cntr and WRADDR.  This means that the address was not being input into BRAM, but an output signal was still occuring.  Then, when I connected the two wires, it was back to nothing but a grid.  So much for that.  
+13. So this got me thinking, do I even need a BRAM?  What if I just delay the unsigned input to readL by one cycle?  Well I tried that just for kicks because it was 0342 at night, but it still didn't work.  Although that would've been cool.
+14. Then I realized I could still get the other parts of the functionality, so I started working on the testbench for the fsm.  I created a simple testbench for the control unit, which would receive various sw signals during simulation, to check that it kept moving to the correct states.  It in fact did, meaning it would control the computer correctly.  
+15. The waveform and a screenshot of the waveform can be seen below: 
+ ![alt tag](https://raw.githubusercontent.com/JohnTerragnoli/ECE383_Lab02/master/Pictures/CU_FSM_TB.PNG "fsm schematic")
+[waveform file](https://raw.githubusercontent.com/JohnTerragnoli/ECE383_Lab02/master/Code/waveform_fsm.wcfg)
 
 
 #Final Product/Code
