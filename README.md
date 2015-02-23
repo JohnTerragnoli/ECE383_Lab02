@@ -77,7 +77,7 @@ sw(2) = trigger
 11. Something actually came on the screen when I ran it!  It wasn't a waveform, it was like pulsing lines on the screen that would go with the music (I have a video of it).  This was pretty exciting.
 12. "It looks as if the BRAM is just writing to the screen continuously, almost as if your cw(2) signal is always high" said Dr. York.  To test this, I just set the wENB signal to be '1'.  When I compiled the code, it looked exactly the same as when it was set to cw(2).  So essentially cw(2) is the same as '1'.  
 13. The first thing to check now is the control unit, although I already checked this for functionality with the testbench.  So when the CU is provided with the proper sw signals, it responds correctly.  This must mean that one or more of the sw signals are working incorrectly, so I began tests which would isolate all three of them.  
-14. Before I did this, however, I decided to hook up the FPGA to the logic analyzer see exactly what was going on with the cw and sw signals.  To do this I needed to change the entity of the Lab2 module.  
+14. Before I did this, however, I decided to hook up the FPGA to the logic analyzer see exactly what was going on with the cw and sw signals.  I also hooked up the reset and clk signals.  
 
 
 
