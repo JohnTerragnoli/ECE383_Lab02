@@ -84,10 +84,15 @@ sw(2) = trigger
 
 
 #Final Product/Code
-
+ 
+ The labeled schematic for the final arrangement can be seen below: 
+ 
+ 
 
 
 #Conclusion
+
+Overall this was the hardest labs I ever did and I never actually got it to work, unfortunately.  
 
 
 #Documentation
