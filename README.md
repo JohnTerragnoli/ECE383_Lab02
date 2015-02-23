@@ -86,13 +86,17 @@ sw(2) = trigger
 #Final Product/Code
  
  The labeled schematic for the final arrangement can be seen below: 
+  ![alt tag](https://raw.githubusercontent.com/JohnTerragnoli/ECE383_Lab02/master/Pictures/Final%20Signals.JPG "fsm schematic")
+ 
+ Also, the final code for this project can just be seen under the "Code" folder for this lab.  
  
  
 
 
 #Conclusion
 
-Overall this was the hardest labs I ever did and I never actually got it to work, unfortunately.  
+Overall this was the hardest labs I ever did and I never actually got it to work, unfortunately.  I was it work with many of my fellow classmates and was really impressed by it.  Nevertheless, throughout this lab I learned numerous different types of errors which can occur in VHDL, how to convert between signed and unsigned quickly, and how to use packets.  
 
 
 #Documentation
+C2C Sabin Park worked with me all Saturday night to help me find out why my code wasn't working.  
