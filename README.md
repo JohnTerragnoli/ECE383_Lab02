@@ -91,11 +91,22 @@ sw(2) = trigger
  Also, the final code for this project can just be seen under the "Code" folder for this lab.  
  
  
+ #Capability: 
+ 1. The horizontal axis represents time. There are 10 major divisions on the display; how long does each major division represent?
+ 2. Each major time division is split into 4 minor division, how long does each minor division represent?
+ 3. Generate a sine wave that can be fully captured on your display (like the yellow channel in the image at the top of this web page). record its height in major and minor vertical divisions. Measure this same audio output using the break out audio cable. Record the peak-to-peak voltage. Compute the number of volts in each major and minor vertical division.
+ 4. Starting at address 0, how long does it take to fill the entire memory with audio samples (coming in at 48kHz)?
+ 5. How long does it take to completely draw the display once?
+ 6. The question is likely relevant to Lab 3 - how long does the vsynch signal go high at the end during the Front Porch, Synch, and Back Porch?
+ 
+ 
 
 
 #Conclusion
 
 Overall this was the hardest labs I ever did and I never actually got it to work, unfortunately.  I was it work with many of my fellow classmates and was really impressed by it.  Nevertheless, throughout this lab I learned numerous different types of errors which can occur in VHDL, how to convert between signed and unsigned quickly, and how to use packets.  
+
+For next year, please don't make it such a "home run" type of project.  
 
 
 #Documentation
