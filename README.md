@@ -78,6 +78,7 @@ sw(2) = trigger
 12. "It looks as if the BRAM is just writing to the screen continuously, almost as if your cw(2) signal is always high" said Dr. York.  To test this, I just set the wENB signal to be '1'.  When I compiled the code, it looked exactly the same as when it was set to cw(2).  So essentially cw(2) is the same as '1'.  
 13. The first thing to check now is the control unit, although I already checked this for functionality with the testbench.  So when the CU is provided with the proper sw signals, it responds correctly.  This must mean that one or more of the sw signals are working incorrectly, so I began tests which would isolate all three of them.  
 14. Before I did this, however, I decided to hook up the FPGA to the logic analyzer see exactly what was going on with the cw and sw signals.  I also hooked up the reset and clk signals.  
+15. But before I could do this, Dr. Coulston looked over my shoulder and said that he thought of a solution to my issue.  He told me to try a couple of things.  First of all, make the process for the register in the trigger logic to be sensitive to the "ready" signal.  Second, add a preregister before the L_bus_out signal is right now.  Third, when comparing to the trigger voltage, divide the unsigned_L_bus_out by two and put a zero in front of it.  
 
 
 
