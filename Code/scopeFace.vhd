@@ -114,7 +114,7 @@ verticalHash <= '1' when (( row >19) and (row <421) and (column >317) and (colum
 grid <= '1' when ((horizontalGrid = '1') or (verticalGrid = '1') or (horizontalHash = '1') or (verticalHash = '1'))
 			else '0';
 
-onOScope <= '1' when((row>19) and (column>19) and (row<421) and (row <621))
+onOScope <= '1' when((row>19) and (column>19) and (row<421) and (column <621))
 			else '0';
 
 

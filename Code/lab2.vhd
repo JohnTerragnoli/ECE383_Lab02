@@ -1,3 +1,15 @@
+------------------------------------------------------------------------------------
+-- Engineer:		C2C John Terragnoli
+-- Create Date:  	2306 on 2/28/15
+-- File Name:		lab02_startover_b.vhd
+
+-- Description:	Takes in an aux signal and outputs the signal visually to be displayed via hdmi on a monitor.  
+
+-- Documentation: I got a whole bunch of advice from Dr. York on a million things
+--						that went wrong with my program. Other than good coding tips,
+--						no help received from other students.
+------------------------------------------------------------------------------------
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
@@ -23,12 +35,9 @@ end lab2;
 architecture behavior of lab2 is
 
 	signal sw: std_logic_vector(2 downto 0);
-	signal cw: std_logic_vector (2 downto 0);
+	signal cw: std_logic_vector(2 downto 0);
 
-	
 begin
-
-
 	
 	datapath: lab2_datapath port map(
 		clk => clk,
@@ -52,13 +61,17 @@ begin
 		exRbus => "0000000000000000",		
 		flagQ => OPEN,
 		flagClear => "00000000",
-		JB => JB);
+		JB => open
+	);
 		
 			  
-	control: lab2_fsm port  map( 
+	control: lab2_fsm port map( 
 		clk => clk,
 		reset => reset,
 		sw => sw,
-		cw => cw);
+		cw => cw
+	);
+
+JB <= "00000000";
 
 end behavior;

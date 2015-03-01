@@ -7,9 +7,6 @@
 --   To use any of the example code shown below, uncomment the lines and modify as necessary
 --
 
-------------------------------------------------------------------------------------------------
--- Counter and comparator added by C2C Terragnoli on 2/23/15
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.ALL;
@@ -43,7 +40,8 @@ end component;
 component ac97 
 	port (
 		n_reset        : in  std_logic;
-		clk            : in  std_logic;								-- ac97 interface signals
+		clk            : in  std_logic;
+																				-- ac97 interface signals
 		ac97_sdata_out : out std_logic;								-- ac97 output to SDATA_IN
 		ac97_sdata_in  : in  std_logic;								-- ac97 input from SDATA_OUT
 		ac97_sync      : out std_logic;								-- SYNC signal to ac97
@@ -59,6 +57,8 @@ component ac97
 		cmd_data       : in  std_logic_vector(15 downto 0) 	-- cmd data coming in from ac97cmd state machine
 		);
 end component;
+
+
 
 
 --/////////////// STATE MACHINE TO CONFIGURE THE AC97 ///////////////////////////--
@@ -138,25 +138,92 @@ end component;
 			  ch2_enb: in std_logic);
 	end component;
 	
+component bram_sdp is
+	Port (	clk: in  STD_LOGIC;
+				reset : in  STD_LOGIC;
+				cw: std_logic_vector(5 downto 0));
+end component;
+
+
+component counter is
+    Port ( clk 	: 	in  STD_LOGIC;
+           reset 	: 	in  STD_LOGIC;
+           ctrl 	: 	in  STD_LOGIC_vector(1 downto 0);
+			  rollover: in  unsigned(9 downto 0);
+			  roll	: 	out std_logic;
+           Q		: 	out unsigned(9 downto 0));
+end component;
+
+component new_counter is
+	generic (N: integer := 10);
+	Port(	clk: in  STD_LOGIC;
+			reset : in  STD_LOGIC;
+			ctrl: in std_logic_vector(1 downto 0);
+			Q: out unsigned (N-1 downto 0));
+end component;
+
+component sign2unsign is
+	Port (	A : in std_logic_vector(17 downto 0);
+				Y : out unsigned(17 downto 0));
 	
-------------------------------------------	----below are my own.  
-	component comparator_10bit is
+end component;
+
+--	component video is
+--    Port ( clk : in  STD_LOGIC;
+--           reset : in  STD_LOGIC;
+--           tmds : out  STD_LOGIC_VECTOR (3 downto 0);
+--           tmdsb : out  STD_LOGIC_VECTOR (3 downto 0);
+--			  trigger_time: in unsigned(11 downto 0);
+--			  trigger_volt: in unsigned (11 downto 0);
+--			  row: out unsigned(11 downto 0);
+--			  column: out unsigned(11 downto 0);
+--			  ch1: in std_logic;
+--			  ch1_enb: in std_logic;
+--			  ch2: in std_logic;
+--			  ch2_enb: in std_logic);
+--	end component;
+
+--component comparator is
+--	generic( N : integer := 10);
+--	port( A : in std_logic_vector(N-1 downto 0);
+--			B : in unsigned(N-1 downto 0);
+--			Y : out std_logic;
+--			COMPARE : in std_logic_vector(1 downto 0));
+--end component;
+
+component comparator is
     Port ( Left : in  std_logic_vector (9 downto 0);
            Right : in  unsigned (9 downto 0);
            LessThan : out  STD_LOGIC;
            Equal : out  STD_LOGIC;
            GreaterThan : out  STD_LOGIC);
-	end component;
-	
-	
-	component counter is
-    Port ( clk : 	in  STD_LOGIC;
-					reset: 	in  STD_LOGIC;
-					crtl: 	in  STD_LOGIC;
-					valueCountTo: in  unsigned(11 downto 0);
-					roll: 	out std_logic;
-					Q	: 	out unsigned(11 downto 0));
-	end component;
-	
+end component;
+
+
+
+
+
+
+
+
+component Delay_one_cycle is
+	 Generic (N: integer := 8);
+    Port ( clk : in  STD_LOGIC;
+           reset : in  STD_LOGIC;
+			  ready : in std_logic; 
+           realTime : in  unsigned (N-1 downto 0);
+			  middleSignal : out unsigned (N-1 downto 0);
+           delayed : out  unsigned (N-1 downto 0));
+end component;
+
+component BRAM_counter is
+    Port ( clk : in  STD_LOGIC;
+           reset : in  STD_LOGIC;
+           cw : in  STD_LOGIC_VECTOR (1 downto 0);
+           write_cntr : out  unsigned (11 downto 0);
+           countOver : out  STD_LOGIC);
+end component;
+
+
 
 end lab2Parts;

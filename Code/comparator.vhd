@@ -8,6 +8,7 @@
 -- Target Devices: ATLYS
 -- Tool versions: 1.0
 -- Description: a comparator with a less than, equal to, and greater than signal.
+--						This is purely combinational logic.  
 --
 -- Dependencies: none
 --
@@ -24,15 +25,15 @@ use IEEE.NUMERIC_STD.ALL;
 library UNISIM;
 use UNISIM.VComponents.all;
 
-entity comparator_10bit is
+entity comparator is
     Port ( Left : in  std_logic_vector (9 downto 0);
            Right : in  unsigned (9 downto 0);
            LessThan : out  STD_LOGIC;
            Equal : out  STD_LOGIC;
            GreaterThan : out  STD_LOGIC);
-end comparator_10bit;
+end comparator;
 
-architecture Behavioral of comparator_10bit is
+architecture Behavioral of comparator is
 
 begin
 

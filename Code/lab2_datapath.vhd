@@ -7,7 +7,8 @@
 -- Project Name:  lab2
 -- Target Devices: ATLYS
 -- Tool versions: 1.0
--- Description: Carrys out all of the work of the oscilloscope, puts the signal onto a monitor.  
+-- Description: Takes in an electrical signal through an aux input and displays the signal
+--					on the screen like an amature oscilloscope.   
 --
 -- Dependencies: control unit.  
 --
@@ -16,15 +17,13 @@
 -- Additional Comments: none
 --
 ----------------------------------------------------------------------------------
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
-library UNISIM;
-use UNISIM.VComponents.all;
 library UNIMACRO;
 use UNIMACRO.vcomponents.all;
 use work.lab2Parts.all;		
-
 
 
 entity lab2_datapath is
@@ -49,67 +48,60 @@ entity lab2_datapath is
 			JB : out std_logic_vector(7 downto 0));
 end lab2_datapath;
 
+
 architecture Behavioral of lab2_datapath is
 
 
 
 
-	--AC97 hookup signals
+	-- signals for the ac97_wrap
 	signal L_bus_in, R_bus_in : std_logic_vector(17 downto 0);
 	signal L_bus_out, R_bus_out : std_logic_vector(17 downto 0);
+
 	
-	--BRAM hookup signals: 
-	signal readL : std_logic_vector(17 downto 0);
-	signal tempReadL: std_logic_vector(17 downto 0); 
-	signal wENB : std_logic; 
-	
-	--BRAM counter signals: 
-	signal BRAM_count_reset: std_logic; 
-	signal BRAM_count_cntr: std_logic; 
-	signal BRAM_counting : unsigned (9 downto 0); 
-	signal write_cntr : unsigned(9 downto 0);
-	signal write_cntr_counter : unsigned(11 downto 0);
-	signal WRADDR : unsigned (9 downto 0); 
-	
-	
-	
-	--video hookup signals
+	-- signals for the video_inst
 	signal row_12bit, column_12bit : unsigned(11 downto 0);
+	signal trigger_time, trigger_volt : unsigned(9 downto 0);
+	signal trigger_time_12bit, trigger_volt_12bit : unsigned (11 downto 0);  
 	signal row, column : unsigned(9 downto 0);
-	signal trigger_time, trigger_volt : unsigned(11 downto 0);
-	signal ch1, ch1_enb : std_logic; 
+	signal ch1, ch1_enb : std_logic;  
 	signal ch2, ch2_enb : std_logic;
+
+
+	--BRAM signals
+	signal write_cntr : unsigned(9 downto 0);
+	signal write_cntr_12bit : unsigned (11 downto 0);
+	signal readL : std_logic_vector(17 downto 0);
 	
-	--unsigned input
-	signal unsigned_L_bus_out : unsigned(17 downto 0);
-	signal Din : unsigned (17 downto 0); 
+	--Trigger Logic Signals
+	signal greaterThanTrigger : std_logic;
+	signal lessThanTrigger : std_logic; 
+	signal newUnsigned, oldUnsigned : unsigned (9 downto 0);  
+
 	
-	
-	--button decoder signals: 
+	--Button Signals
 	signal old_button, button_activity: std_logic_vector(4 downto 0);
 	
-	--trigger Logic: 
-	signal newCompare : unsigned (9 downto 0); 
-	signal oldCompare : unsigned (9 downto 0); 
-	signal unsigned_L_bus_greater, old_unsigned_L_bus_less: std_logic; 
-	
-	
-	--sw signals
-	signal ready : std_logic;			--sw(0)
-	signal countOver: std_logic; 		--sw(1)
-	--comes from trigger logic 		--sw(2)
-	
+	--internal signals for sw, so we can view them with the logic analyzer.  
+	signal ready : std_logic; 			--sw(0)
+	signal BRAM_over : std_logic; 	--sw(1)
+	signal trigger_sw : std_logic; 	--sw(2)
 
-	
-	
-	
-	
-	
+		--misc signals
+	signal unsigned_L_bus_out : unsigned(17 downto 0);
+	signal aligned_column : unsigned(9 downto 0);
 
-begin
 
---ac97 instant--------------------------------------------------------------------------------------------------
-	-- the ac97 instantiation
+
+	--for some reason it doesn't trigger correctly, so I have to use this where ever trigger is mentioned.  
+	constant trigger_shift : integer := 290; 
+
+
+
+begin 
+
+
+---- the ac97 instantiation-------------------------------------------------------------------------------
 	ac97_wrap: ac97_wrapper port map(
 		reset => reset,
 		clk => clk,
@@ -122,15 +114,37 @@ begin
 		L_out => L_bus_in,
 		R_out => R_bus_in,
 		L_in => L_bus_out,
-		R_in => R_bus_out);
-		
+		R_in => R_bus_out);	
+----------------------------------------------------------------------------------------------------------	
 sw(0) <= ready;
-----------------------------------------------------------------------------------------------------------------
+		
 
 
 
-
-
+--Video Instantiation----------------------------------------------------------------------------------------	
+	video_inst: video port map(
+		clk => clk,
+		reset => reset,
+		tmds => tmds,
+		tmdsb => tmdsb,
+		trigger_time => "00"&trigger_time,
+--		trigger_volt => "00"&trigger_volt,
+		trigger_volt => "00"&trigger_volt-trigger_shift,
+		row => row_12bit,
+		column => column_12bit,
+		ch1 => ch1,
+		ch1_enb => '1',
+		ch2 => ch2,
+		ch2_enb => '1');
+row<= row_12bit (9 downto 0); 
+column <= column_12bit (9 downto 0);
+--
+--ch2 <= '1' when (row=column) else
+--		'0';  
+ch2 <= '1' when (row = 400) else
+		'0';  
+---------------------------------------------------------------------------------------------------------------	
+			
 --BRAM instant--------------------------------------------------------------------------------------------------
     sampleMemory: BRAM_SDP_MACRO
 		generic map (
@@ -146,267 +160,164 @@ sw(0) <= ready;
 		port map (
 			DO => readL,					-- Output read data port, width defined by READ_WIDTH parameter
 --			DO => OPEN,					-- Output read data port, width defined by READ_WIDTH parameter
-			RDADDR => std_logic_vector(column),		-- Input address, width defined by port depth
+			RDADDR => std_logic_vector(aligned_column),		-- Input address, width defined by port depth
 			RDCLK => clk,	 				-- 1-bit input clock
 			RST => (not reset),				-- active high reset
 			RDEN => '1',					-- read enable 
 			REGCE => '1',					-- 1-bit input read output register enable - ignored
-			DI => std_logic_vector(Din),	-- Input data port, width defined by WRITE_WIDTH parameter
+			DI => std_logic_vector(unsigned_L_bus_out),	-- Input data port, width defined by WRITE_WIDTH parameter
 			WE => "11",						-- since RAM is byte read, this determines high or low byte
-			WRADDR => std_logic_vector(WRADDR),		-- Input write address, width defined by write port depth
+			WRADDR => std_logic_vector(write_cntr),		-- Input write address, width defined by write port depth
 			WRCLK => clk,		 			-- 1-bit input write clock
 			WREN => cw(2));				-- 1-bit input write port enable
+--			WREN => '1');				-- 1-bit input write port enable
 ----------------------------------------------------------------------------------------------------------------
+	
+	
+--2Unsigned---------------------------------------------------------------------------------------------------
+	unsigned_L_bus_out <= "100000000000000000" + unsigned(L_bus_out);
+--------------------------------------------------------------------------------------------------------------
+
+
+
+--BRAM Section Logic------------------------------------------------------------------------------------------
+	BRAM_count : BRAM_counter 
+    Port map ( clk => clk, 
+           reset => reset, 
+           cw => cw(1 downto 0),
+           write_cntr => write_cntr_12bit,
+           countOver => BRAM_over);
+			  
+	write_cntr <= write_cntr_12bit (9 downto 0);
+	sw(1) <= BRAM_over;
+--------------------------------------------------------------------------------------------------------------
 
 
 
 
-
-
-
---VIDEO instant-------------------------------------------------------------------------------------------------
-	video_inst: video port map(
-		clk => clk,
-		reset => reset,
-		tmds => tmds,
-		tmdsb => tmdsb,
-		trigger_time => trigger_time,
-		trigger_volt => trigger_volt,
-		row => row_12bit,
-		column => column_12bit,
-		ch1 => ch1,
-		ch1_enb => '1',
-		ch2 => ch2,
-		ch2_enb => '1');
-		
---make that diagonal line.  
-ch2 <= '1' when (row_12bit = column_12bit) else
-		'0';	
-----------------------------------------------------------------------------------------------------------------
-
-
-
-
-
------------------------------------------------------------------------------------------------
-----BUTTON DECODER START
------------------------------------------------------------------------------------------------
---makes it work with just one click and not a press so it doesn't run across the screen. 	
-process(clk)
-	begin
-	if(rising_edge(clk)) then
-		if(reset = '0') then
-			old_button <= "00000";
-		else
-			button_activity <= (not old_button) and btn;
-		end if;
-			old_button <= btn;
-	end if;
-end process;
-
-
-
---checks to see if a button has been hit for every clock cycle.  		
-	process(clk)
-	begin
-		if(rising_edge(clk)) then
-			--centers the triggers again.  
-			if(reset='0') then
-				trigger_time <= x"140";
-				trigger_volt <= x"0DC";
-				
-			--moves volt trigger up
-			elsif((button_activity = "00001") and (trigger_volt>=30)) then
-				trigger_volt <= trigger_volt - x"0A";
-				
-			--move time trigger left
-			elsif((button_activity= "00010") and (trigger_time>=30)) then
-				trigger_time <= trigger_time - x"0A";
-				
-			--moes volt trigger down
-			elsif((button_activity = "00100") and (trigger_volt<=410)) then
-				trigger_volt <= trigger_volt + x"0A";
-			
-			--moves time trigger right
-			elsif((button_activity = "01000") and (trigger_time<=610))then
-				trigger_time <= trigger_time + x"0A";
-			
-			--moves the triggers back to center.  
-			elsif(button_activity = "10000") then
-				trigger_time <= x"140";
-				trigger_volt <= x"0DC";
-				
+--Trigger Logic-----------------------------------------------------------------------------------------------
+		process(ready)	
+		begin
+			if(rising_edge(ready)) then
+				if(reset = '0') then
+					newUnsigned <= (others => '0');
+				else
+					newUnsigned <= (unsigned_L_bus_out(17 downto 8));
+				end if;
 			end if;
+		end process;
+
+		process(ready)
+		begin
+			if(rising_edge(ready)) then
+				if(reset = '0') then
+					oldUnsigned <= (others => '0');
+				else
+					oldUnsigned <= newUnsigned;
+				end if;
+			end if;
+		end process;
+	
+	
+	greaterThan : comparator
+	port map (std_logic_vector(newUnsigned), trigger_volt, OPEN, OPEN, greaterThanTrigger); 
+	
+	
+	lessThan : comparator
+	port map (std_logic_vector(oldUnsigned), trigger_volt,lessThanTrigger, OPEN, OPEN); 
+	
+	trigger_sw <= (greaterThanTrigger and lessThanTrigger);
+	sw(2) <= trigger_sw;
+--------------------------------------------------------------------------------------------------------------
+	
+	
+	
+	
+	
+	
+--Bottom Right Comparator-------------------------------------------------------------------------------------
+	readLComp : comparator
+--	port map (std_logic_vector(unsigned(readL(17 downto 8))-300), row, OPEN, ch1, OPEN); 
+--	port map (std_logic_vector(unsigned(readL(17 downto 8))-325), row, OPEN, ch1, OPEN); 
+--	port map (std_logic_vector(unsigned(readL(17 downto 8))-200), row, OPEN, ch1, OPEN); 
+	port map (std_logic_vector(unsigned(readL(17 downto 8))-trigger_shift), row, OPEN, ch1, OPEN); --original
+--	port map (std_logic_vector(unsigned(readL(17 downto 8))-225), row, OPEN, ch1, OPEN); 
+--	port map (std_logic_vector(unsigned(readL(17 downto 8))-175), row, OPEN, ch1, OPEN); 
+--	port map (std_logic_vector(unsigned(readL(17 downto 8))+10), row, OPEN, ch1, OPEN); --kicks
+--	port map (std_logic_vector(unsigned(readL(17 downto 8))), row, OPEN, ch1, OPEN); 
+--------------------------------------------------------------------------------------------------------------	
+	
+	
+	
+	
+	
+--senters the trigger time on the screen----------------------------------------------------------------------
+	aligned_column <= column - 20;
+--------------------------------------------------------------------------------------------------------------
+
+
+
+
+	
+
+	 
+
+	 
+----audio loop-----------------------------------------------------------------------------------------
+	process (clk)
+	begin
+		if (rising_edge(clk)) then
+			 if reset = '0' then
+				L_bus_in <= (others => '0');
+				R_bus_in <= (others => '0');				
+			 elsif(ready = '1') then
+				L_bus_in <= L_bus_out;
+				R_bus_in <= R_bus_out;
+			 end if;
 		end if;
 	end process;
----------------------------------------------------------------------------------------------
---BUTTON DECODER END
----------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------- 
 
-
-
-
-
-
-
-
-
---Signed2Unsign Mux---------------------------------------------------------------------------------------------
-unsigned_L_bus_out <= "100000000000000000" + unsigned(L_bus_out);
---implement someday, keep it simple for now.  
-Din <= unsigned_L_bus_out; 
-----------------------------------------------------------------------------------------------------------------
-
-
-
-
-
---AudioLoop-----------------------------------------------------------------------------------------------------
-  process (clk)
-	begin
-	if (rising_edge(clk)) then
-	    if reset = '0' then
-		L_bus_in <= (others => '0');
-		R_bus_in <= (others => '0');				
-	    elsif(ready = '1') then
-		L_bus_in <= L_bus_out;
-		R_bus_in <= R_bus_out;
-	    end if;
-	end if;
-  end process;
-----------------------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
---wENB Mux BRAM-------------------------------------------------------------------------------------------------
-wENB <= cw(2); 
-----------------------------------------------------------------------------------------------------------------
-
-
-
-
---BRAM Counter--------------------------------------------------------------------------------------------------
---BRAM_count_reset <= '0' when (cw(1 downto 0) = "00") else
---							'1'; 
---							
---BRAM_count_cntr <= '1' when (cw(1 downto 0) = "01") else
---						'0' when (cw (1 downto 0) = "10") else
---						'1'; 
-
-
-  process (clk)
-	begin
-	if (rising_edge(clk)) then
-	    if reset = '0' then
-			BRAM_count_reset <= '0'; 
-	    elsif(cw(1 downto 0) = "00") then
-			BRAM_count_reset <= '0'; 
-		 elsif(cw(1 downto 0) = "01") then
-			BRAM_count_cntr <= '1';
-		 elsif(cw(1 downto 0) = "10") then
-			BRAM_count_cntr <= '0';
-	    end if;
-	end if;
-  end process;				
-						
-
---BRAM_count : counter
---		port map (clk, BRAM_count_reset, BRAM_count_cntr, x"3FF", countOver, write_cntr_counter);
+	
+--BUTTON LOGIC---------------------------------------------------------------------------------------------	
+	--copied from Lab01
+	process(clk)
+		begin
+			if(rising_edge(clk)) then
+				if(reset = '0') then
+					old_button <= "00000";
+				else
+					button_activity <= btn and (not old_button);
+				end if;
+				old_button <= btn;
+			end if;
+	end process;
 
 	process(clk)
-	begin
-		if(rising_edge(clk)) then
-			if(reset = '0') then
-					BRAM_counting <= (others => '0');
-			elsif(BRAM_count_reset = '0') then
-					BRAM_counting <= (others => '0');
-			elsif((BRAM_counting < x"3ff") and (BRAM_count_cntr = '1')) then
-					BRAM_counting <= BRAM_counting + 1;
-			elsif((BRAM_counting = x"3ff") and (BRAM_count_cntr = '1')) then
-					BRAM_counting <= (others => '0');
+		begin 
+			if(rising_edge(clk)) then
+				if(reset = '0') then
+					trigger_time <= "0101000000";
+					trigger_volt <= "0011011100" + trigger_shift;
+--					trigger_volt <= "0011011100";
+				elsif(button_activity(0) = '1') then		-- move up
+					trigger_volt <= trigger_volt - 5;
+				elsif(button_activity(1) = '1') then		-- move left
+					trigger_time <= trigger_time - 5;
+				elsif(button_activity(2) = '1') then		-- move down
+					trigger_volt <= trigger_volt + 5;
+				elsif(button_activity(3) = '1') then		-- move right
+					trigger_time <= trigger_time + 5;
+				elsif(button_activity(4) = '1') then		-- return both triggers to center
+					trigger_time <= "0101000000";
+					trigger_volt <= "0011011100" + trigger_shift;		
+--					trigger_volt <= "0011011100";		
+				end if;
 			end if;
-		end if;
 	end process;
+----------------------------------------------------------------------------------------------------------------	
 	
-	countOver <= '1' when (BRAM_counting = x"3ff") and (BRAM_count_cntr = '1') else '0';
-
---write_cntr <= write_cntr_counter(9 downto 0); 	
---	
---sw(1) <= countOver; 
-
-write_cntr <= BRAM_counting; 	
 	
-sw(1) <= countOver; 
-----------------------------------------------------------------------------------------------------------------
-
-
-
-
---BRAM Counter Mux----------------------------------------------------------------------------------------------
---make it fancier later.  
-WRADDR <= write_cntr; 
-----------------------------------------------------------------------------------------------------------------
-
-
-
-
---Trigger Logic-------------------------------------------------------------------------------------------------
-process(clk)
-	begin
-	if(rising_edge(clk)) then
-		if(reset = '0') then
-			newCompare <= "0000000000"; 
-		else
-			newCompare <= unsigned_L_bus_out(17 downto 8); 
-		end if; 
-	end if;
-end process;
-
-process(clk)
-	begin
-	if(rising_edge(clk)) then
-		if(reset = '0') then
-			oldCompare <= "0000000000"; 
-		else
-			oldCompare <= newCompare; 
-		end if; 
-	end if;
-end process;
-
-
-greaterTrigger : comparator_10bit
-	port map (std_logic_vector(newCompare), trigger_volt (9 downto 0), OPEN, OPEN, unsigned_L_bus_greater); 
-	
-lessTrigger : comparator_10bit
-	port map (std_logic_vector(oldCompare), trigger_volt (9 downto 0), old_unsigned_L_bus_less, OPEN, OPEN); 
-	
-sw(2) <= (unsigned_L_bus_greater and old_unsigned_L_bus_less); 
-
---sw(2) <= '1';
-----------------------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
---ReadL Compare-------------------------------------------------------------------------------------------------
-	readLComp : comparator_10bit 
-		port map (readL(17 downto 8), row, OPEN, ch1, OPEN); 
-----------------------------------------------------------------------------------------------------------------
-
-
-
---not using this right now.  
-JB <= "00000000"; 
-
-
-
 
 end Behavioral;
 

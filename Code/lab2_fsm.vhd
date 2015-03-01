@@ -18,13 +18,7 @@
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx primitives in this code.
 library UNISIM;
 use UNISIM.VComponents.all;
 
@@ -40,8 +34,8 @@ architecture Behavioral of lab2_fsm is
 
 
 --creates the different types of states
-type state is (resetState, waitTrigger, storeSample, waitNextSample); 
-signal CurrentState: state; 
+type stateType is (resetState, waitTrigger, storeSample, waitNextSample); 
+signal state: stateType; 
 
 
 
@@ -66,43 +60,44 @@ begin
 	begin
 		if(rising_edge(clk)) then
 			if(reset = '0') then 
-				CurrentState <= resetState;
-			end if; 
+				state <= resetState;
+			else 
 			
 			
-			CASE CurrentState is 
+				CASE state is 
 
-				when resetState =>
-					cw <= "000"; 
-					CurrentState <= waitTrigger;
-				
-				
-				when waitTrigger =>
-					cw <= "000"; 
-					if(sw(2) = '1') then 
-						CurrentState <= storeSample; 
-					else
-						CurrentState <= waitTrigger;
-					end if; 
+					when resetState =>
+						cw <= "000"; 
+						state <= waitTrigger;
+					
+					
+					when waitTrigger =>
+						cw <= "000"; 
+						if(sw(2) = '1') then 
+							state <= storeSample; 
+						else
+							state <= waitTrigger;
+						end if; 
 
-				
-				when storeSample =>
-					cw <= "101";  
-					currentState <= waitNextSample; 
-				
-				
-				when waitNextSample =>
-					cw <= "010";
-					if(sw(0) = '1') then 
-						CurrentState <= storeSample; 
-					elsif(sw(1) = '1') then 
-						CurrentState <= waitTrigger;
-					else
-						CurrentState <= waitNextSample; 
-					end if; 
-	
-	
-				end case; 
+					
+					when storeSample =>
+						cw <= "101";  
+	--					cw <= "010";  
+						state <= waitNextSample; 
+					
+					
+					when waitNextSample =>
+						cw <= "010";
+	--					cw <= "101";
+						if(sw(0) = '1') then 
+							state <= storeSample; 
+						elsif(sw(1) = '1') then 
+							state <= waitTrigger;
+						else
+							state <= waitNextSample; 
+						end if; 
+					end case; 
+				end if; 
 		end if;
 	end process;
 

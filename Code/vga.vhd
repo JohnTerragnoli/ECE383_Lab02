@@ -62,7 +62,7 @@ signal v_synch_signal, v_blank_signal: std_logic;
 
 
 --preparing the digit counter to be used.  
-component cascadeCounter is 
+component counter_glue is 
 		Port(	clk: in  STD_LOGIC;
 			reset : in  STD_LOGIC;
 			crtl: in std_logic;
@@ -112,7 +112,7 @@ begin
 --combined the columns and the glue
 --should count through all of the pixels on the screen according to the clock.
 --returns the row and column number for the rest of this module to use.  
-		doubleCounter: cascadeCounter port map(
+		doubleCounter: counter_glue port map(
 			clk => clk,
 			reset => reset,
 			crtl => '1',
