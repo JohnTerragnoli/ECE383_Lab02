@@ -28,13 +28,7 @@ component lab2
 			  btn: in	STD_LOGIC_VECTOR(4 downto 0));
 end component;
 
-component flagRegister 
-	Generic (N: integer := 8);
-	Port(	clk: in  STD_LOGIC;
-			reset : in  STD_LOGIC;
-			set, clear: in std_logic_vector(N-1 downto 0);
-			Q: out std_logic_vector(N-1 downto 0));
-end component;
+
 
 
 component ac97 
@@ -135,7 +129,8 @@ end component;
 			  ch1: in std_logic;
 			  ch1_enb: in std_logic;
 			  ch2: in std_logic;
-			  ch2_enb: in std_logic);
+			  ch2_enb: in std_logic;
+			  v_synch_out: out std_logic);
 	end component;
 	
 component bram_sdp is
@@ -168,28 +163,7 @@ component sign2unsign is
 	
 end component;
 
---	component video is
---    Port ( clk : in  STD_LOGIC;
---           reset : in  STD_LOGIC;
---           tmds : out  STD_LOGIC_VECTOR (3 downto 0);
---           tmdsb : out  STD_LOGIC_VECTOR (3 downto 0);
---			  trigger_time: in unsigned(11 downto 0);
---			  trigger_volt: in unsigned (11 downto 0);
---			  row: out unsigned(11 downto 0);
---			  column: out unsigned(11 downto 0);
---			  ch1: in std_logic;
---			  ch1_enb: in std_logic;
---			  ch2: in std_logic;
---			  ch2_enb: in std_logic);
---	end component;
 
---component comparator is
---	generic( N : integer := 10);
---	port( A : in std_logic_vector(N-1 downto 0);
---			B : in unsigned(N-1 downto 0);
---			Y : out std_logic;
---			COMPARE : in std_logic_vector(1 downto 0));
---end component;
 
 component comparator is
     Port ( Left : in  std_logic_vector (9 downto 0);
@@ -222,6 +196,14 @@ component BRAM_counter is
            cw : in  STD_LOGIC_VECTOR (1 downto 0);
            write_cntr : out  unsigned (11 downto 0);
            countOver : out  STD_LOGIC);
+end component;
+
+component flagRegister 
+	Generic (N: integer := 8);
+	Port(	clk: in  STD_LOGIC;
+			reset : in  STD_LOGIC;
+			set, clear: in std_logic_vector(N-1 downto 0);
+			Q: out std_logic_vector(N-1 downto 0));
 end component;
 
 

@@ -36,7 +36,8 @@ entity video is
 			  ch1: in std_logic;
 			  ch1_enb: in std_logic;
 			  ch2: in std_logic;
-			  ch2_enb: in std_logic);
+			  ch2_enb: in std_logic;
+			  v_synch_out : out std_logic);
 end video;
 
 architecture structure of video is
@@ -67,7 +68,7 @@ architecture structure of video is
 
 begin
 
-
+	v_synch_out <= v_synch; 
 	------------------------------------------------------------------------------
 	-- The reset for the digital clock manager is active high (see page 7) here:
 	-- http://www.xilinx.com/support/documentation/application_notes/xapp462.pdf

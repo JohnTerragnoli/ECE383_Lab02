@@ -72,6 +72,8 @@ architecture Behavioral of lab2_datapath is
 	signal write_cntr : unsigned(9 downto 0);
 	signal write_cntr_12bit : unsigned (11 downto 0);
 	signal readL : std_logic_vector(17 downto 0);
+	signal readR : std_logic_vector(17 downto 0);
+	
 	
 	--Trigger Logic Signals
 	signal greaterThanTrigger : std_logic;
@@ -81,6 +83,7 @@ architecture Behavioral of lab2_datapath is
 	
 	--Button Signals
 	signal old_button, button_activity: std_logic_vector(4 downto 0);
+	signal readyNextMove : std_logic; 
 	
 	--internal signals for sw, so we can view them with the logic analyzer.  
 	signal ready : std_logic; 			--sw(0)
@@ -89,7 +92,13 @@ architecture Behavioral of lab2_datapath is
 
 		--misc signals
 	signal unsigned_L_bus_out : unsigned(17 downto 0);
+	signal unsigned_R_bus_out : unsigned(17 downto 0);
 	signal aligned_column : unsigned(9 downto 0);
+	signal v_synch : std_logic; 
+	signal v_synch_vector : std_logic_vector (1 downto 0); 
+	signal ready_vector : std_logic_vector (1 downto 0); 
+	
+	
 
 
 
@@ -135,14 +144,15 @@ sw(0) <= ready;
 		ch1 => ch1,
 		ch1_enb => '1',
 		ch2 => ch2,
-		ch2_enb => '1');
+		ch2_enb => '1',
+		v_synch_out => v_synch);
 row<= row_12bit (9 downto 0); 
 column <= column_12bit (9 downto 0);
 --
 --ch2 <= '1' when (row=column) else
 --		'0';  
-ch2 <= '1' when (row = 400) else
-		'0';  
+--ch2 <= '1' when (row = 400) else
+--		'0';  
 ---------------------------------------------------------------------------------------------------------------	
 			
 --BRAM instant--------------------------------------------------------------------------------------------------
@@ -174,8 +184,38 @@ ch2 <= '1' when (row = 400) else
 ----------------------------------------------------------------------------------------------------------------
 	
 	
+	--BRAM instant--------------------------------------------------------------------------------------------------
+    sampleMemory_R: BRAM_SDP_MACRO
+		generic map (
+			BRAM_SIZE => "18Kb", 				-- Target BRAM, "9Kb" or "18Kb"
+			DEVICE => "SPARTAN6", 				-- Target device: "VIRTEX5", "VIRTEX6", "SPARTAN6"
+			DO_REG => 0, 							-- Optional output register disabled
+			INIT => X"000000000000000000",	-- Initial values on output port
+			INIT_FILE => "NONE",					-- Not sure how to initialize the RAM from a file
+			WRITE_WIDTH => 18, 					-- Valid values are 1-36
+			READ_WIDTH => 18, 					-- Valid values are 1-36
+			SIM_COLLISION_CHECK => "NONE",	-- Simulation collision check
+			SRVAL => X"000000000000000000")	-- Set/Reset value for port output
+		port map (
+			DO => readR,					-- Output read data port, width defined by READ_WIDTH parameter
+--			DO => OPEN,					-- Output read data port, width defined by READ_WIDTH parameter
+			RDADDR => std_logic_vector(aligned_column),		-- Input address, width defined by port depth
+			RDCLK => clk,	 				-- 1-bit input clock
+			RST => (not reset),				-- active high reset
+			RDEN => '1',					-- read enable 
+			REGCE => '1',					-- 1-bit input read output register enable - ignored
+			DI => std_logic_vector(unsigned_R_bus_out),	-- Input data port, width defined by WRITE_WIDTH parameter
+			WE => "11",						-- since RAM is byte read, this determines high or low byte
+			WRADDR => std_logic_vector(write_cntr),		-- Input write address, width defined by write port depth
+			WRCLK => clk,		 			-- 1-bit input write clock
+			WREN => cw(2));				-- 1-bit input write port enable
+--			WREN => '1');				-- 1-bit input write port enable
+----------------------------------------------------------------------------------------------------------------
+	
+	
 --2Unsigned---------------------------------------------------------------------------------------------------
-	unsigned_L_bus_out <= "100000000000000000" + unsigned(L_bus_out);
+	unsigned_L_bus_out <= "100000000000000000" + unsigned(L_bus_out);	
+	unsigned_R_bus_out <= "100000000000000000" + unsigned(R_bus_out);
 --------------------------------------------------------------------------------------------------------------
 
 
@@ -237,14 +277,12 @@ ch2 <= '1' when (row = 400) else
 	
 --Bottom Right Comparator-------------------------------------------------------------------------------------
 	readLComp : comparator
---	port map (std_logic_vector(unsigned(readL(17 downto 8))-300), row, OPEN, ch1, OPEN); 
---	port map (std_logic_vector(unsigned(readL(17 downto 8))-325), row, OPEN, ch1, OPEN); 
---	port map (std_logic_vector(unsigned(readL(17 downto 8))-200), row, OPEN, ch1, OPEN); 
 	port map (std_logic_vector(unsigned(readL(17 downto 8))-trigger_shift), row, OPEN, ch1, OPEN); --original
---	port map (std_logic_vector(unsigned(readL(17 downto 8))-225), row, OPEN, ch1, OPEN); 
---	port map (std_logic_vector(unsigned(readL(17 downto 8))-175), row, OPEN, ch1, OPEN); 
---	port map (std_logic_vector(unsigned(readL(17 downto 8))+10), row, OPEN, ch1, OPEN); --kicks
---	port map (std_logic_vector(unsigned(readL(17 downto 8))), row, OPEN, ch1, OPEN); 
+	
+	readRComp : comparator
+	port map (std_logic_vector(unsigned(readR(17 downto 8))-trigger_shift), row, OPEN, ch2, OPEN);
+
+
 --------------------------------------------------------------------------------------------------------------	
 	
 	
@@ -281,6 +319,41 @@ ch2 <= '1' when (row = 400) else
 	
 --BUTTON LOGIC---------------------------------------------------------------------------------------------	
 	--copied from Lab01
+--	process(clk)
+--		begin
+--			if(rising_edge(clk)) then
+--				if(reset = '0') then
+--					old_button <= "00000";
+--				else
+--					button_activity <= btn and (not old_button);
+--				end if;
+--				old_button <= btn;
+--			end if;
+--	end process;
+--
+--	process(clk)
+--		begin 
+--			if(rising_edge(clk)) then
+--				if(reset = '0') then
+--					trigger_time <= "0101000000";
+--					trigger_volt <= "0011011100" + trigger_shift;
+----					trigger_volt <= "0011011100";
+--				elsif(button_activity(0) = '1') then		-- move up
+--					trigger_volt <= trigger_volt - 5;
+--				elsif(button_activity(1) = '1') then		-- move left
+--					trigger_time <= trigger_time - 5;
+--				elsif(button_activity(2) = '1') then		-- move down
+--					trigger_volt <= trigger_volt + 5;
+--				elsif(button_activity(3) = '1') then		-- move right
+--					trigger_time <= trigger_time + 5;
+--				elsif(button_activity(4) = '1') then		-- return both triggers to center
+--					trigger_time <= "0101000000";
+--					trigger_volt <= "0011011100" + trigger_shift;		
+----					trigger_volt <= "0011011100";		
+--				end if;
+--			end if;
+--	end process;	
+	
 	process(clk)
 		begin
 			if(rising_edge(clk)) then
@@ -300,24 +373,43 @@ ch2 <= '1' when (row = 400) else
 					trigger_time <= "0101000000";
 					trigger_volt <= "0011011100" + trigger_shift;
 --					trigger_volt <= "0011011100";
-				elsif(button_activity(0) = '1') then		-- move up
+				elsif((button_activity(0) = '1') and readyNextMove = '1') then		-- move up
+					readyNextMove <= '0';
 					trigger_volt <= trigger_volt - 5;
-				elsif(button_activity(1) = '1') then		-- move left
+				elsif((button_activity(1) = '1') and readyNextMove = '1')then		-- move left
+					readyNextMove <= '0';
 					trigger_time <= trigger_time - 5;
-				elsif(button_activity(2) = '1') then		-- move down
+				elsif((button_activity(2) = '1') and readyNextMove = '1') then		-- move down
+					readyNextMove <= '0';
 					trigger_volt <= trigger_volt + 5;
-				elsif(button_activity(3) = '1') then		-- move right
+				elsif((button_activity(3) = '1') and readyNextMove = '1')then		-- move right
+					readyNextMove <= '0';
 					trigger_time <= trigger_time + 5;
-				elsif(button_activity(4) = '1') then		-- return both triggers to center
-					trigger_time <= "0101000000";
-					trigger_volt <= "0011011100" + trigger_shift;		
+				elsif((button_activity(4) = '1') and readyNextMove = '0')then		-- return both triggers to center
+					readyNextMove <= '1';
+--					trigger_time <= "0101000000";
+--					trigger_volt <= "0011011100" + trigger_shift;		
 --					trigger_volt <= "0011011100";		
 				end if;
 			end if;
 	end process;
+	
+	
+	
+	
 ----------------------------------------------------------------------------------------------------------------	
 	
 	
+--FLAG REGISTER-------------------------------------------------------------------------------------------------
 
+--ready_vector <= '0' & ready; 
+--v_synch_vector <= '0' & v_synch; 
+--
+--FLAG_REG : flagRegister 
+--	Generic MAP (1)
+--	Port MAP(CLK, reset, ready_vector(0 downto 0), v_synch_vector (0 downto 0), open);
+
+	
+----------------------------------------------------------------------------------------------------------------	
 end Behavioral;
 

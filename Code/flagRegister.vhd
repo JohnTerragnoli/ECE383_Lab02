@@ -59,23 +59,23 @@ begin
 --			end if;
 			
 			
-			if(rising_edge(clk)) then 
-				for i in 0 to N-1 loop	
-					
-					if((set(i) = '0') and (clear(i) ='0')) then 
-						--Q just stays as Q
-					elsif((set(i)= '1') and (clear(i) ='0')) then
-						Q_internal(i) <= '1'; 
-					elsif((set(i) = '0') and (clear(i) ='1')) then
-						Q_internal(i) <= '0'; 
-					elsif((set(i) = '0') and (clear(i)='1')) then
-						--don't care about Q.  
-					else
-						--don't care about Q.  
-					end if;
-					
-				end loop; 
-			end if; 
+--			if(rising_edge(clk)) then 
+--				for i in 0 to N-1 loop	
+--					
+--					if((set(i) = '0') and (clear(i) ='0')) then 
+--						--Q just stays as Q
+--					elsif((set(i)= '1') and (clear(i) ='0')) then
+--						Q_internal(i) <= '1'; 
+--					elsif((set(i) = '0') and (clear(i) ='1')) then
+--						Q_internal(i) <= '0'; 
+--					elsif((set(i) = '0') and (clear(i)='1')) then
+--						--don't care about Q.  
+--					else
+--						--don't care about Q.  
+--					end if;
+--					
+--				end loop; 
+--			end if; 
 			
 			
 			
