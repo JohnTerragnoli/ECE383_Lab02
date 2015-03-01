@@ -88,7 +88,8 @@ sw(2) = trigger
 onOScope <= '1' when((row>19) and (column>19) and (row<421) and (row <621))
 			else '0';
 ```
-			I just changed "row<621" to "column<621" and this fixed the issue.  I'm surprised I did not catch this in lab01.  
+
+I just changed "row<621" to "column<621" and this fixed the issue.  I'm surprised I did not catch this in lab01.  
 
 
 
