@@ -87,7 +87,7 @@ sw(2) = trigger
  ```
 onOScope <= '1' when((row>19) and (column>19) and (row<421) and (row <621))
 			else '0';
-			```
+```
 			I just changed "row<621" to "column<621" and this fixed the issue.  I'm surprised I did not catch this in lab01.  
 
 
@@ -126,4 +126,4 @@ For next year, please don't make it such a "home run" type of project.
 
 
 #Documentation
-C2C Sabin Park worked with me all Saturday night to help me find out why my code wasn't working.  
+C2C Sabin Park lent me his working code so I could compare it with mine and find the issue.  
