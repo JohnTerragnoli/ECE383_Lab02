@@ -99,6 +99,10 @@ I just changed "row<621" to "column<621" and this fixed the issue.  I'm surprise
 21. Once this was finished, I decided to work on the flag register.  This was fairly straightforward.  The screenshot of this can be seen below: 
 
  ![alt tag](https://raw.githubusercontent.com/JohnTerragnoli/ECE383_Lab02/master/Pictures/flag_register_works.PNG "flag_register")
+ 
+ [Flag Register Waveform](https://raw.githubusercontent.com/JohnTerragnoli/ECE383_Lab02/master/Code/flagRegister_tb.wcfg)
+ 
+ 22. I saw that the flag register worked correctly, and worked towards the rest of the functionality.  I noticed that I already had A Functionality, as the signal would follow the point where the trigger_volt was set.  I just had to add another signal onto the screen and debounce the buttons.  I took care of both of these issues.  For the second signal, I just added another instantiation of BRAM, a unsigned for the R bus, and a readR signal and appropriate comparator.  I did this using the right bus from the audio input.  This actually worked on the first try, although the right and left signals are only slightly different.  As for the debouncing, I just added a signal called readyNextMove, which was set low after a directional button was hit and high when the center button was hit.  I then made this signal being high a requirement for when a directional button could be hit.  Therefore, a center button press had to occur before any consecutive movement from the directional buttons.  I believe this was the debouncing strategy talked about in class. 
 
 
 
@@ -108,7 +112,7 @@ I just changed "row<621" to "column<621" and this fixed the issue.  I'm surprise
  The labeled schematic for the final arrangement can be seen below: 
   ![alt tag](https://raw.githubusercontent.com/JohnTerragnoli/ECE383_Lab02/master/Pictures/Final%20Signals.JPG "fsm schematic")
  
- Also, the final code for this project can just be seen under the "Code" folder for this lab.  
+ Also, the final code for this project can just be seen under the "Code" folder for this lab.  This includes many of the testbenches and their waveforms for smaller modules created during this lab.  
  
  
 #Capability: 
