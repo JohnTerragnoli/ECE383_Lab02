@@ -96,6 +96,11 @@ onOScope <= '1' when((row>19) and (column>19) and (row<421) and (row <621))
 
 I just changed "row<621" to "column<621" and this fixed the issue.  I'm surprised I did not catch this in lab01.  
 
+21. Once this was finished, I decided to work on the flag register.  This was fairly straightforward.  The screenshot of this can be seen below: 
+
+ ![alt tag](https://raw.githubusercontent.com/JohnTerragnoli/ECE383_Lab02/master/Pictures/flag_register_works.PNG "flag_register")
+
+
 
 
 #Final Product/Code
@@ -106,7 +111,7 @@ I just changed "row<621" to "column<621" and this fixed the issue.  I'm surprise
  Also, the final code for this project can just be seen under the "Code" folder for this lab.  
  
  
- #Capability: 
+#Capability: 
  1. The horizontal axis represents time. There are 10 major divisions on the display; how long does each major division represent?
  2. Each major time division is split into 4 minor division, how long does each minor division represent?
  3. Generate a sine wave that can be fully captured on your display (like the yellow channel in the image at the top of this web page). record its height in major and minor vertical divisions. Measure this same audio output using the break out audio cable. Record the peak-to-peak voltage. Compute the number of volts in each major and minor vertical division.
