@@ -123,6 +123,9 @@ I just changed "row<621" to "column<621" and this fixed the issue.  I'm surprise
  5. How long does it take to completely draw the display once?
  6. The question is likely relevant to Lab 3 - how long does the vsynch signal go high at the end during the Front Porch, Synch, and Back Porch?
  
+ The work and answers to these questions are below: 
+   ![alt tag](https://raw.githubusercontent.com/JohnTerragnoli/ECE383_Lab02/master/Pictures/Lab02%20Questions.JPG "Questions/Answers")
+ 
  
 
 
